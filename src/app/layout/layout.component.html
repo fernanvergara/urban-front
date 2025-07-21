@@ -1,0 +1,70 @@
+<!-- src/app/layout/layout.component.html -->
+<div class="min-h-screen flex flex-col bg-gray-100 font-sans">
+  <!-- Barra de Navegación Superior -->
+  <nav class="bg-gradient-to-r from-teal-600 to-teal-800 p-4 shadow-lg">
+    <div class="container mx-auto flex justify-between items-center">
+      <!-- Logo o Título de la Aplicación -->
+      <a routerLink="/pedidos" class="text-white text-3xl font-extrabold tracking-tight rounded-md px-2 py-1 transition duration-300 ease-in-out hover:bg-teal-700">
+        UrbanApp
+      </a>
+
+      <!-- Enlaces de Navegación -->
+      <div class="flex space-x-6">
+        <!-- Pedidos -->
+        <a routerLink="/pedidos"
+           routerLinkActive="bg-teal-700 shadow-md transform scale-105"
+           [routerLinkActiveOptions]="{exact: true}"
+           class="text-white text-lg font-medium py-2 px-4 rounded-lg transition duration-300 ease-in-out hover:bg-teal-700 hover:shadow-md hover:text-white">
+          Pedidos
+        </a>
+        <!-- Clientes -->
+        <a routerLink="/clientes"
+           routerLinkActive="bg-teal-700 shadow-md transform scale-105"
+           class="text-white text-lg font-medium py-2 px-4 rounded-lg transition duration-300 ease-in-out hover:bg-teal-700 hover:shadow-md hover:text-white">
+          Clientes
+        </a>
+        <!-- Conductores -->
+        <a routerLink="/conductores"
+           routerLinkActive="bg-teal-700 shadow-md transform scale-105"
+           class="text-white text-lg font-medium py-2 px-4 rounded-lg transition duration-300 ease-in-out hover:bg-teal-700 hover:shadow-md hover:text-white">
+          Conductores
+        </a>
+        <!-- Usuarios -->
+        <a routerLink="/usuarios"
+           routerLinkActive="bg-teal-700 shadow-md transform scale-105"
+           class="text-white text-lg font-medium py-2 px-4 rounded-lg transition duration-300 ease-in-out hover:bg-teal-700 hover:shadow-md hover:text-white">
+          Usuarios
+        </a>
+        <!-- Vehículos -->
+        <a routerLink="/vehiculos"
+           routerLinkActive="bg-teal-700 shadow-md transform scale-105"
+           class="text-white text-lg font-medium py-2 px-4 rounded-lg transition duration-300 ease-in-out hover:bg-teal-700 hover:shadow-md hover:text-white">
+          Vehículos
+        </a>
+      </div>
+
+      <!-- Información de Usuario y Botón de Cerrar Sesión -->
+      <div class="flex items-center space-x-4">
+        <span class="text-white text-lg font-semibold">
+          Bienvenido, {{ username }} ({{ role }})
+        </span>
+        <button
+          (click)="logout()"
+          class="bg-red-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-600 transition duration-300 ease-in-out shadow-md"
+        >
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contenido Principal (donde se cargan las rutas hijas) -->
+  <main class="flex-grow p-6">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- Pie de Página (Opcional) -->
+  <footer class="bg-gray-800 text-white p-4 text-center text-sm">
+    &copy; 2025 UrbanApp. Todos los derechos reservados.
+  </footer>
+</div>

@@ -1,0 +1,27 @@
+<!-- src/app/login/login.component.html -->
+<div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+  <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Iniciar Sesión</h2>
+  <form (ngSubmit)="handleLogin()" class="space-y-6">
+    <div>
+      <label for="loginUsername" class="block text-sm font-medium text-gray-700 mb-1">Usuario</label>
+      <input type="text" id="loginUsername" name="loginUsername" [(ngModel)]="loginUsername"
+        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        placeholder="Tu nombre de usuario" required>
+    </div>
+    <div>
+      <label for="loginPassword" class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+      <input type="password" id="loginPassword" name="loginPassword" [(ngModel)]="loginPassword"
+        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        placeholder="Tu contraseña" required>
+    </div>
+    <button type="submit"
+      class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+      Iniciar Sesión
+    </button>
+  </form>
+  <div class="mt-6 text-center">
+    <p class="text-sm text-gray-600">¿No tienes una cuenta?
+      <a (click)="goToRegister()" class="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer">Regístrate aquí</a>
+    </p>
+  </div>
+</div>

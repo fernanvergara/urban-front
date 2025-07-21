@@ -1,0 +1,177 @@
+<!-- src/app/components/conductor/conductor.component.html -->
+<div class="container mx-auto p-6 bg-white shadow-xl rounded-lg">
+  <h1 class="text-4xl font-extrabold text-teal-700 mb-8 text-center">Gestión de Conductores</h1>
+
+  <!-- Sección de Mensajes -->
+  <div *ngIf="message" class="mb-6 p-4 rounded-lg text-center font-medium"
+       [ngClass]="{
+         'bg-green-100 text-green-800 border border-green-400': messageType === 'success',
+         'bg-red-100 text-red-800 border border-red-400': messageType === 'error',
+         'bg-blue-100 text-blue-800 border border-blue-400': messageType === 'info'
+       }">
+    {{ message }}
+  </div>
+
+  <!-- Área de Datos del Conductor -->
+  <div class="bg-gray-50 p-8 rounded-lg shadow-inner mb-8">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Datos del Conductor</h2>
+    <form (ngSubmit)="guardarConductor()" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- ID de Conductor (no editable) -->
+      <div class="col-span-1">
+        <label for="id" class="block text-sm font-medium text-gray-700 mb-1">ID de Usuario:</label>
+        <input type="text" id="id" [(ngModel)]="conductor.id" name="id" disabled
+               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-200 cursor-not-allowed">
+      </div>
+
+      <!-- Estado Activo -->
+      <div class="col-span-1 flex items-center">
+        <input type="checkbox" name="activo" [(ngModel)]="conductor.activo" disabled
+                class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded">
+        <label for="activo" class="ml-2 block text-sm font-medium text-gray-700">Estado Activo: <span class="font-semibold">{{ conductor.activo ? 'Activo' : 'Inactivo' }}</span></label>
+      </div>
+
+      <!-- Nombre Completo -->
+      <div class="col-span-1">
+        <label for="nombreCompleto" class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
+        <input type="text" id="nombreCompleto" name="nombreCompleto" [(ngModel)]="conductor.nombreCompleto" required
+               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+               placeholder="Ej: Juan Pérez">
+      </div>
+
+      <!-- Identificación -->
+      <div class="col-span-1">
+        <label for="identificacion" class="block text-sm font-medium text-gray-700 mb-1">Identificación</label>
+        <input type="text" id="identificacion" name="identificacion" [(ngModel)]="conductor.identificacion" required
+               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+               placeholder="Ej: 1012345678">
+      </div>
+
+      <!-- Fecha de Nacimiento -->
+      <div class="col-span-1">
+        <label for="fechaNacimiento" class="block text-sm font-medium text-gray-700 mb-1">Fecha de Nacimiento (DD/MM/YYYY)</label>
+        <input type="text" id="fechaNacimiento" name="fechaNacimiento" [(ngModel)]="conductor.fechaNacimiento" required
+               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+               placeholder="Ej: 15/05/1985">
+      </div>
+
+      <!-- Teléfono -->
+      <div class="col-span-1">
+        <label for="telefono" class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+        <input type="text" id="telefono" name="telefono" [(ngModel)]="conductor.telefono" required
+               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+               placeholder="Ej: +573001234567">
+      </div>
+
+      <!-- Botones de CRUD -->
+      <div class="col-span-full flex flex-wrap justify-center gap-4 mt-6">
+        <button (click)="nuevoConductor()"
+                class="px-6 py-3 bg-teal-600 text-white font-semibold rounded-lg shadow-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:scale-105">
+          <i class="fas fa-plus-circle mr-2"></i> Nuevo
+        </button>
+        <button type="button" (click)="abrirModalBusqueda()"
+                class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:scale-105">
+          <i class="fas fa-search mr-2"></i> Buscar
+        </button>
+        <button type="submit"
+                [disabled]="!conductor.nombreCompleto || !conductor.identificacion || !conductor.telefono || !conductor.fechaNacimiento"
+                class="px-6 py-3 bg-yellow-600 text-white font-semibold rounded-lg shadow-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+          <i class="fas fa-save mr-2"></i> {{ conductor.id ? 'Actualizar' : 'Guardar Nuevo' }}
+        </button>
+        <button type="button" (click)="abrirModalConfirmacion()"
+                [disabled]="!conductor.id"
+                class="px-6 py-3 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+          <i class="fas fa-toggle-on mr-2"></i> {{ conductor.activo ? 'Inactivar' : 'Activar' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Listado de Conductores -->
+  <div class="bg-gray-50 p-8 rounded-lg shadow-inner">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Listado de Conductores</h2>
+    <div class="overflow-x-auto rounded-lg shadow-md">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-200">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">ID</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Nombre Completo</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Identificación</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Fecha Nacimiento</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Teléfono</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Estado</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let c of conductores"
+              (dblclick)="seleccionarConductorParaEdicion(c)"
+              [ngClass]="{'bg-teal-50': c.id === conductor.id, 'hover:bg-gray-50 cursor-pointer': true}">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ c.id }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ c.nombreCompleto }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ c.identificacion }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ c.fechaNacimiento }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ c.telefono }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm">
+              <span [ngClass]="{'px-2 inline-flex text-xs leading-5 font-semibold rounded-full': true,
+                                'bg-green-100 text-green-800': c.activo,
+                                'bg-red-100 text-red-800': !c.activo}">
+                {{ c.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+          </tr>
+          <tr *ngIf="conductores.length === 0">
+            <td colspan="6" class="px-6 py-4 text-center text-gray-500">No hay conductores para mostrar.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal de Búsqueda -->
+  <div *ngIf="showSearchModal" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
+    <div class="bg-white p-8 rounded-lg shadow-2xl max-w-sm w-full text-center">
+      <h3 class="text-xl font-bold text-gray-900 mb-4">Buscar Usuario</h3>
+      <div class="mb-4 text-left">
+        <label for="searchIdModal" class="block text-sm font-medium text-gray-700 mb-1">Buscar por ID:</label>
+        <input type="number" id="searchIdModal" [(ngModel)]="searchId" name="searchIdModal"
+               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+      </div>
+      <div class="mb-6 text-left">
+        <label for="searchIentificacionModal" class="block text-sm font-medium text-gray-700 mb-1">Buscar por Identificación:</label>
+        <input type="text" id="searchIentificacionModal" [(ngModel)]="searchIdentificacion" name="searchIdentificacionModal"
+               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+      </div>
+      <div class="flex justify-center gap-4">
+        <button (click)="buscarConductor()"
+                class="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-300">
+          Buscar
+        </button>
+        <button (click)="cerrarModalBusqueda()"
+                class="px-6 py-2 bg-gray-300 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-300">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmación de Inactivación -->
+  <div *ngIf="showConfirmModal" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
+    <div class="bg-white p-8 rounded-lg shadow-2xl max-w-sm w-full text-center">
+      <h3 class="text-xl font-bold text-gray-900 mb-4">Confirmar Acción</h3>
+      <p class="text-gray-700 mb-6">
+        ¿Está seguro de que desea {{ conductor.activo ? 'inactivar' : 'activar' }} al usuario
+        <span class="font-semibold text-red-600">{{ conductor.nombreCompleto }}</span> (ID: {{ conductor.id }})?
+      </p>
+      <div class="flex justify-center gap-4">
+        <button (click)="inactivarConductor()"
+                class="px-6 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-300">
+          Confirmar
+        </button>
+        <button (click)="cerrarModalConfirmacion()"
+                class="px-6 py-2 bg-gray-300 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-300">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

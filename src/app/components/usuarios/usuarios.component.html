@@ -1,0 +1,180 @@
+<!-- src/app/components/usuarios/usuarios.component.html -->
+<div class="container mx-auto p-6 bg-white shadow-xl rounded-lg font-inter">
+  <h1 class="text-4xl font-extrabold text-indigo-700 mb-8 text-center">Gestión de Usuarios</h1>
+
+  <!-- Sección de Mensajes -->
+  <div *ngIf="message" class="mb-6 p-4 rounded-lg text-center font-medium"
+       [ngClass]="{
+         'bg-green-100 text-green-800 border border-green-400': messageType === 'success',
+         'bg-red-100 text-red-800 border border-red-400': messageType === 'error',
+         'bg-blue-100 text-blue-800 border border-blue-400': messageType === 'info'
+       }">
+    {{ message }}
+  </div>
+
+  <!-- Área de Datos del Usuario -->
+  <div class="bg-gray-50 p-8 rounded-lg shadow-inner mb-8">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Datos del Usuario</h2>
+    <form (ngSubmit)="guardarUsuario()" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- ID de Usuario (no editable) -->
+      <div class="col-span-1">
+        <label for="id" class="block text-sm font-medium text-gray-700 mb-1">ID de Usuario:</label>
+        <input type="text" id="id" [(ngModel)]="usuario.id" name="id" disabled
+               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-gray-200 cursor-not-allowed">
+      </div>
+
+      <!-- Estado Activo -->
+      <div class="col-span-1 flex items-center">
+        <input type="checkbox" [(ngModel)]="usuario.activo" name="activo" disabled
+               class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded">
+        <label for="activo" class="ml-2 block text-sm font-medium text-gray-700">Estado Activo: <span class="font-semibold">{{ usuario.activo ? 'Activo' : 'Inactivo' }}</span></label>
+      </div>
+
+      <!-- Nombre de Usuario -->
+      <div class="col-span-1">
+        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Nombre de Usuario:</label>
+        <input type="text" id="username" [(ngModel)]="usuario.username" name="username" required
+               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+      </div>
+
+      <!-- Contraseña -->
+      <div class="col-span-1">
+        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Contraseña (dejar vacío para no cambiar):</label>
+        <input type="password" id="password" [(ngModel)]="usuario.password" name="password"
+               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+      </div>
+
+      <!-- Rol -->
+      <div class="col-span-1">
+        <label for="rol" class="block text-sm font-medium text-gray-700 mb-1">Rol:</label>
+        <select id="rol" [(ngModel)]="usuario.rol" name="rol" required
+                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white">
+          <option value="" disabled>Seleccione un rol</option>
+          <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+        </select>
+      </div>
+
+      <!-- Conductor Asignado -->
+      <div *ngIf="usuario.conductor" class="col-span-1">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Conductor Asignado:</label>
+        <input type="text" [value]="usuario.conductor.nombreCompleto" disabled
+               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-200 cursor-not-allowed sm:text-sm">
+      </div>
+      <!-- Cliente Asignado -->
+      <div *ngIf="usuario.cliente" class="col-span-1">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Cliente Asignado:</label>
+        <input type="text" [value]="usuario.cliente.nombreCompleto" disabled
+               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-200 cursor-not-allowed sm:text-sm">
+      </div>
+
+      <!-- Botones de CRUD -->
+      <div class="col-span-full flex flex-wrap justify-center gap-4 mt-6">
+        <button type="button" (click)="nuevoUsuario()"
+                class="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:scale-105">
+          <i class="fas fa-plus-circle mr-2"></i> Nuevo
+        </button>
+        <button type="button" (click)="abrirModalBusqueda()"
+                class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:scale-105">
+          <i class="fas fa-search mr-2"></i> Buscar
+        </button>
+        <button type="submit"
+                [disabled]="!usuario.username || !usuario.rol || (!usuario.id && !usuario.password)"
+                class="px-6 py-3 bg-yellow-600 text-white font-semibold rounded-lg shadow-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+          <i class="fas fa-save mr-2"></i> {{ usuario.id ? 'Actualizar' : 'Guardar Nuevo' }}
+        </button>
+        <button type="button" (click)="abrirModalConfirmacion()"
+                [disabled]="!usuario.id"
+                class="px-6 py-3 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+          <i class="fas fa-toggle-on mr-2"></i> {{ usuario.activo ? 'Inactivar' : 'Activar' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Listado de Usuarios -->
+  <div class="bg-gray-50 p-8 rounded-lg shadow-inner">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Listado de Usuarios</h2>
+    <div class="overflow-x-auto rounded-lg shadow-md">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-200">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">ID</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Username</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Rol</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Conductor</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Cliente</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Estado</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let u of usuarios" (dblclick)="seleccionarUsuarioParaEdicion(u)"
+              [ngClass]="{'bg-teal-100': u.id === usuario.id, 'hover:bg-gray-100 cursor-pointer': true}">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ u.id }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ u.username }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ u.rol }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ u.conductor ? u.conductor.nombreCompleto : 'No Asignado' }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ u.cliente ? u.cliente.nombreCompleto : 'No Asignado' }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm">
+              <span [ngClass]="{'px-2 inline-flex text-xs leading-5 font-semibold rounded-full': true,
+                                'bg-green-100 text-green-800': u.activo,
+                                'bg-red-100 text-red-800': !u.activo}">
+                {{ u.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+          </tr>
+          <tr *ngIf="usuarios.length === 0">
+            <td colspan="6" class="px-6 py-4 text-center text-gray-500">No hay usuarios para mostrar.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal de Búsqueda -->
+  <div *ngIf="showSearchModal" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
+    <div class="bg-white p-8 rounded-lg shadow-2xl max-w-sm w-full text-center">
+      <h3 class="text-xl font-bold text-gray-900 mb-4">Buscar Usuario</h3>
+      <div class="mb-4 text-left">
+        <label for="searchIdModal" class="block text-sm font-medium text-gray-700 mb-1">Buscar por ID:</label>
+        <input type="number" id="searchIdModal" [(ngModel)]="searchId" name="searchIdModal"
+               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+      </div>
+      <div class="mb-6 text-left">
+        <label for="searchUsernameModal" class="block text-sm font-medium text-gray-700 mb-1">Buscar por Username:</label>
+        <input type="text" id="searchUsernameModal" [(ngModel)]="searchUsername" name="searchUsernameModal"
+               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+      </div>
+      <div class="flex justify-center gap-4">
+        <button (click)="buscarUsuario()"
+                class="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-300">
+          Buscar
+        </button>
+        <button (click)="cerrarModalBusqueda()"
+                class="px-6 py-2 bg-gray-300 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-300">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmación de Inactivación -->
+  <div *ngIf="showConfirmModal" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
+    <div class="bg-white p-8 rounded-lg shadow-2xl max-w-sm w-full text-center">
+      <h3 class="text-xl font-bold text-gray-900 mb-4">Confirmar Acción</h3>
+      <p class="text-gray-700 mb-6">
+        ¿Está seguro de que desea {{ usuario.activo ? 'inactivar' : 'activar' }} al usuario
+        <span class="font-semibold text-red-600">{{ usuario.username }}</span> (ID: {{ usuario.id }})?
+      </p>
+      <div class="flex justify-center gap-4">
+        <button (click)="inactivarUsuario()"
+                class="px-6 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-300">
+          Confirmar
+        </button>
+        <button (click)="cerrarModalConfirmacion()"
+                class="px-6 py-2 bg-gray-300 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition duration-300">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
